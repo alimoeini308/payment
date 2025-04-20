@@ -16,11 +16,7 @@ return new class extends Migration
             $table->string('username');
             $table->string('phone');
             $table->text('description')->nullable();
-            $table->unsignedBigInteger('amount');
-            $table->string('gateway');      //zarinpal,shepa,zibal
-            $table->string('token');
-            $table->enum('status',['pending','success','failed'])->default('pending');
-            $table->text('details')->nullable();
+            $table->unsignedBigInteger('amount')->nullable();
             $table->timestamps();
         });
     }

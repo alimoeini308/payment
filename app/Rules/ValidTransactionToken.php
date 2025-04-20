@@ -2,11 +2,11 @@
 
 namespace App\Rules;
 
+use App\Models\Transaction;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Support\Facades\DB;
 
-class ValidPaymentToken implements ValidationRule
+class ValidTransactionToken implements ValidationRule
 {
     protected string $gateway;
 
@@ -17,14 +17,14 @@ class ValidPaymentToken implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $exists = DB::table('payments')
+        $exists = Transaction::query()
             ->where('gateway', $this->gateway)
             ->where('token', $value)
-            ->where('status', 'pending')
+            //->where('status', 'pending')
             ->exists();
 
         if (! $exists) {
-            $fail("تراکنشی با این $attribute و وضعیت pending برای درگاه {$this->gateway} یافت نشد.");
+            $fail(" تراکنشی با این $attribute و وضعیت pending برای درگاه {$this->gateway} یافت نشد. ");
         }
     }
 }

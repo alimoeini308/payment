@@ -5,7 +5,7 @@ namespace App\Http\Requests\PaymentRequests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreatePaymentRequest extends FormRequest
+class ReversePaymentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,11 +23,7 @@ class CreatePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "username"  => "required|string",
-            "phone" => "required|numeric",
-            "description" => "string",
-            "amount" => "numeric|min:1000",
-            "gateway" => "in:zarinpal,shepa,zibal"
+            "payment_id" => "numeric|exists:transactions,payment_id",
         ];
     }
 }

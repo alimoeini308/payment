@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Requests\PaymentRequests;
+namespace App\Http\Requests\TransactionRequests;
 
-use App\Rules\ValidPaymentToken;
+use App\Rules\ValidTransactionToken;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class VerifyPaymentRequest extends FormRequest
+class VerifyTransactionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,15 +26,15 @@ class VerifyPaymentRequest extends FormRequest
             'gateway' => 'required|in:zarinpal,shepa,zibal',
 
             // Zarinpal
-            'Authority' => ['required_if:gateway,zarinpal',new ValidPaymentToken('zarinpal')],
+            'Authority' => ['required_if:gateway,zarinpal',new ValidTransactionToken('zarinpal')],
             'Status' => 'required_if:gateway,zarinpal',
 
             // Shepa
-            'token' => ['required_if:gateway,shepa',new ValidPaymentToken('shepa')],
+            'token' => ['required_if:gateway,shepa',new ValidTransactionToken('shepa')],
             'status' => 'required_if:gateway,shepa',
 
             // Zibal
-            'trackId' => ['required_if:gateway,zibal',new ValidPaymentToken('zibal')],
+            'trackId' => ['required_if:gateway,zibal',new ValidTransactionToken('zibal')],
             'success' => 'required_if:gateway,zibal',
         ];
     }

@@ -1,6 +1,7 @@
 <?php
 return [
     'available' => explode(',', env('GATEWAYS', 'zarinpal,shepa,zibal')),
+    'max_amount' => env('MAX_AMOUNT', '100000'),
     'default' => env('DEFAULT_GATEWAY', 'zarinpal'),
     'fields' => [
         'zarinpal' => [

@@ -4,26 +4,29 @@ namespace App\Http\Services\Gateways;
 
 use App\Http\Services\Gateways\Contracts\Gateway;
 use App\Http\Services\Gateways\Contracts\PaymentResult;
+use App\Http\Services\Gateways\Contracts\VerifyResult;
+use App\Models\Transaction;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
 class Zibal implements Gateway
 {
     protected Client $client;
+    protected string $merchantId;
 
     public function __construct()
     {
         $this->client = new Client();
+        $this->merchantId = env('ZIBAL_MERCHANT_ID','zibal');
     }
 
-    public function payment($amount)
+    public function payment($amount): PaymentResult
     {
-        $merchantId=env('ZIBAL_MERCHANT_ID','zibal');
-
         $response = $this->client->post('https://gateway.zibal.ir/v1/request', [
             'json' => [
-                'merchant' => $merchantId,
+                'merchant' => $this->merchantId,
                 'amount' => $amount,
-                'callbackUrl' => route('payment.verify.v1',['gateway' => 'zibal']),
+                'callbackUrl' => route('transaction.verify.v1',['gateway' => 'zibal']),
                 'description' => 'Transaction description.',
             ],
             'headers' => [
@@ -36,5 +39,32 @@ class Zibal implements Gateway
         $data = json_decode($body, true);
         $token = $data['trackId'];
         return new PaymentResult($token,"https://gateway.zibal.ir/start/".$token);
+    }
+    public function verify(Transaction $transaction): VerifyResult
+    {
+        $response = $this->client->post('https://gateway.zibal.ir/v1/verify', [
+            'json' => [
+                'merchant' => $this->merchantId,
+                'trackId' => $transaction->getAttributeValue('token'),
+            ],
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+        ]);
+
+        $body = $response->getBody()->getContents();
+        $response = json_decode($body, true);
+        if ($response['result'] == 100) {
+            return new VerifyResult($response['refNumber']);
+        }else{
+            return new VerifyResult(null,$response['message']);
+        }
+    }
+
+    public function reverse(Transaction $transaction): bool
+    {
+        //TODO:: zibal doesnt have refund yet
+        return false;
     }
 }
