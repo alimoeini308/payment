@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Http\Services\Gateways\Contracts\Gateway;
 use App\Http\Services\Gateways\Contracts\GatewayManager;
 use Illuminate\Support\ServiceProvider;
 

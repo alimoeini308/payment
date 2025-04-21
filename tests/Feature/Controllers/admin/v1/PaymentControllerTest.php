@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Controllers;
+namespace Controllers\admin\v1;
 
 use Faker\Factory;
 use Faker\Generator;
@@ -49,17 +49,17 @@ class PaymentControllerTest extends TestCase
         ]);
     }
 
-    public function test_create_payment_with_zarinpal_transaction_v1(): void
+    public function test_create_payment_with_zarinpal_transaction(): void
     {
         $this->createTestGateways('zarinpal');
     }
 
-    public function test_create_payment_with_shepa_transaction_v1(): void
+    public function test_create_payment_with_shepa_transaction(): void
     {
         $this->createTestGateways('shepa');
     }
 
-    public function test_create_payment_with_zibal_transaction_v1(): void
+    public function test_create_payment_with_zibal_transaction(): void
     {
         $this->createTestGateways('zibal');
     }

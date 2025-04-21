@@ -3,8 +3,8 @@
 namespace App\Http\Services\Gateways;
 
 use App\Http\Services\Gateways\Contracts\Gateway;
-use App\Http\Services\Gateways\Contracts\PaymentResult;
-use App\Http\Services\Gateways\Contracts\VerifyResult;
+use App\Http\Services\Gateways\Contracts\PaymentGatewayResult;
+use App\Http\Services\Gateways\Contracts\VerifyGatewayResult;
 use App\Models\Transaction;
 use Exception;
 use GuzzleHttp\Client;
@@ -23,7 +23,7 @@ class Shepa implements Gateway
         $this->merchantId = env('SHEPA_API_KEY','sandbox');
     }
 
-    public function payment($amount): PaymentResult
+    public function payment($amount): PaymentGatewayResult
     {
         $client = new Client();
 
@@ -40,13 +40,13 @@ class Shepa implements Gateway
 
         if ($responseData['success'] === true) {
             $responseResult = $responseData['result'];
-            return new PaymentResult($responseResult['token'],$responseResult['url']);
+            return new PaymentGatewayResult($responseResult['token'],$responseResult['url']);
         } else {
             throw new Exception($responseData['errors']);
         }
     }
 
-    public function verify(Transaction $transaction): VerifyResult
+    public function verify(Transaction $transaction): VerifyGatewayResult
     {
         $response = $this->client->post("https://".$this->url.".shepa.com/api/v1/verify", [
             'form_params' => [
@@ -59,9 +59,9 @@ class Shepa implements Gateway
         $body = $response->getBody();
         $response = json_decode($body, true);
         if ($response['success']) {
-            return new VerifyResult($response['result']['transaction_id']);
+            return new VerifyGatewayResult($response['result']['transaction_id']);
         } else {
-            return new VerifyResult(null, $response['error']);
+            return new VerifyGatewayResult(null, $response['error']);
         }
     }
 

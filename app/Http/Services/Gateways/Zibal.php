@@ -3,8 +3,8 @@
 namespace App\Http\Services\Gateways;
 
 use App\Http\Services\Gateways\Contracts\Gateway;
-use App\Http\Services\Gateways\Contracts\PaymentResult;
-use App\Http\Services\Gateways\Contracts\VerifyResult;
+use App\Http\Services\Gateways\Contracts\PaymentGatewayResult;
+use App\Http\Services\Gateways\Contracts\VerifyGatewayResult;
 use App\Models\Transaction;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -20,7 +20,7 @@ class Zibal implements Gateway
         $this->merchantId = env('ZIBAL_MERCHANT_ID','zibal');
     }
 
-    public function payment($amount): PaymentResult
+    public function payment($amount): PaymentGatewayResult
     {
         $response = $this->client->post('https://gateway.zibal.ir/v1/request', [
             'json' => [
@@ -38,9 +38,9 @@ class Zibal implements Gateway
         $body = $response->getBody()->getContents();
         $data = json_decode($body, true);
         $token = $data['trackId'];
-        return new PaymentResult($token,"https://gateway.zibal.ir/start/".$token);
+        return new PaymentGatewayResult($token,"https://gateway.zibal.ir/start/".$token);
     }
-    public function verify(Transaction $transaction): VerifyResult
+    public function verify(Transaction $transaction): VerifyGatewayResult
     {
         $response = $this->client->post('https://gateway.zibal.ir/v1/verify', [
             'json' => [
@@ -56,9 +56,9 @@ class Zibal implements Gateway
         $body = $response->getBody()->getContents();
         $response = json_decode($body, true);
         if ($response['result'] == 100) {
-            return new VerifyResult($response['refNumber']);
+            return new VerifyGatewayResult($response['refNumber']);
         }else{
-            return new VerifyResult(null,$response['message']);
+            return new VerifyGatewayResult(null,$response['message']);
         }
     }
 

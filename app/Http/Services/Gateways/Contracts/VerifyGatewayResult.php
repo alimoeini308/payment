@@ -2,7 +2,7 @@
 
 namespace App\Http\Services\Gateways\Contracts;
 
-class VerifyResult
+class VerifyGatewayResult
 {
     public function __construct(
         public string $trackingCode,

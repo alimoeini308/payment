@@ -2,7 +2,7 @@
 
 namespace App\Http\Services\Gateways\Contracts;
 
-class PaymentResult
+class PaymentGatewayResult
 {
     public function __construct(
         public string $token,

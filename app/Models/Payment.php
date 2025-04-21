@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-    protected $guarded = [];
+    protected $fillable = ['username','phone','description','amount'];
     protected $appends = ['payment_link'];
 
     public function transactions()

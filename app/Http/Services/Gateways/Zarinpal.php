@@ -3,8 +3,8 @@
 namespace App\Http\Services\Gateways;
 
 use App\Http\Services\Gateways\Contracts\Gateway;
-use App\Http\Services\Gateways\Contracts\PaymentResult;
-use App\Http\Services\Gateways\Contracts\VerifyResult;
+use App\Http\Services\Gateways\Contracts\PaymentGatewayResult;
+use App\Http\Services\Gateways\Contracts\VerifyGatewayResult;
 use App\Models\Transaction;
 use Exception;
 use GuzzleHttp\Client;
@@ -24,7 +24,7 @@ class Zarinpal implements Gateway
         $this->merchantId = env('ZARINPAL_MERCHANT_ID',Str::uuid()->toString());
     }
 
-    public function payment($amount): PaymentResult
+    public function payment($amount): PaymentGatewayResult
     {
         $response = $this->client->post("https://".$this->url.".zarinpal.com/pg/v4/payment/request.json", [
             'json' => [
@@ -50,10 +50,10 @@ class Zarinpal implements Gateway
         $paymentToken=$data['data']["authority"];
         $paymentUrl="https://".$this->url.".zarinpal.com/pg/StartPay/$paymentToken" ;
 
-        return new PaymentResult($paymentToken,$paymentUrl);
+        return new PaymentGatewayResult($paymentToken,$paymentUrl);
     }
 
-    public function verify(Transaction $transaction): VerifyResult
+    public function verify(Transaction $transaction): VerifyGatewayResult
     {
         $url = "https://".$this->url.".zarinpal.com/pg/v4/payment/verify.json";
         $response = $this->client->post($url, [
@@ -72,9 +72,9 @@ class Zarinpal implements Gateway
         $response = json_decode($body, true);
         $responseData = $response["data"];
         if ($responseData['code'] == 100){
-            return new VerifyResult($responseData['ref_id']);
+            return new VerifyGatewayResult($responseData['ref_id']);
         }else{
-            return new VerifyResult(null, $response['errors']);
+            return new VerifyGatewayResult(null, $response['errors']);
         }
     }
 

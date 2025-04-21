@@ -28,7 +28,11 @@ class TransactionController extends Controller
         $transaction = Transaction::query()->where('gateway',$gatewayType)->where('token',$token)->first();
         if ($temporaryStatus){
             if ($transaction->getAttributeValue('status') == 'pending'){
-                $gateway = app(GatewayManager::class)->resolve($request->get('gateway', config('gateways.default')));
+                try {
+                    $gateway = app(GatewayManager::class)->resolve($request->get('gateway', config('gateways.default')));
+                }catch (Exception $exception){
+                    return my_response(message: $exception->getMessage(),status: 500);
+                }
                 $gatewayVerify = $gateway->verify($transaction);
                 if ($gatewayVerify->isSuccess()) {
                     $transaction->update(['status' => 'success', 'tracking_code' => $gatewayVerify->trackingCode]);
@@ -61,7 +65,7 @@ class TransactionController extends Controller
                 'link'  => $gatewayPayment->url
             ]);
         }elseif ($payment->amount > $payment->total_paid){
-            $nextTransaction = Transaction::query()->where('payment_id',$payment->getAttributeValue('id'))->where('amount',max_amount($payment->amount - $payment->total_paid))->first();
+            $nextTransaction = Transaction::query()->where('status','pending')->where('payment_id',$payment->getAttributeValue('id'))->where('amount',max_amount($payment->amount - $payment->total_paid))->first();
         }
 
         return my_response([

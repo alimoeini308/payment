@@ -6,7 +6,7 @@ use App\Models\Transaction;
 
 interface Gateway
 {
-    public function payment($amount) : PaymentResult;
-    public function verify(Transaction $transaction) : VerifyResult;
+    public function payment($amount) : PaymentGatewayResult;
+    public function verify(Transaction $transaction) : VerifyGatewayResult;
     public function reverse(Transaction $transaction) : bool;
 }
